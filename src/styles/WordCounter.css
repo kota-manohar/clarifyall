@@ -1,0 +1,270 @@
+/* Word Counter Tool Specific Styles */
+
+.word-counter-page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 1.5rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+}
+
+.word-counter-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.word-counter-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.word-counter-header p {
+    font-size: 1rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.word-counter-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
+}
+
+/* Stats Grid */
+.word-counter-stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    /* 6 columns for the 6 stats */
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive grid for smaller screens */
+@media (max-width: 768px) {
+    .word-counter-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .word-counter-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.word-stat-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.word-stat-card:hover {
+    transform: translateY(-2px);
+    border-color: #cbd5e1;
+}
+
+.word-stat-icon {
+    padding: 0.4rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    display: inline-flex;
+}
+
+.word-stat-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.word-stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Color Utilities for Stats */
+.text-blue-600 {
+    color: #2563eb;
+}
+
+.bg-blue-50 {
+    background-color: #eff6ff;
+}
+
+.text-green-600 {
+    color: #16a34a;
+}
+
+.bg-green-50 {
+    background-color: #f0fdf4;
+}
+
+.text-purple-600 {
+    color: #9333ea;
+}
+
+.bg-purple-50 {
+    background-color: #faf5ff;
+}
+
+.text-orange-600 {
+    color: #ea580c;
+}
+
+.bg-orange-50 {
+    background-color: #fff7ed;
+}
+
+.text-pink-600 {
+    color: #db2777;
+}
+
+.bg-pink-50 {
+    background-color: #fdf2f8;
+}
+
+.text-teal-600 {
+    color: #0d9488;
+}
+
+.bg-teal-50 {
+    background-color: #f0fdfa;
+}
+
+.text-gray-500 {
+    color: #6b7280;
+}
+
+/* Input Section */
+.word-input-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.word-input-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.word-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    resize: vertical;
+    transition: all 0.2s;
+    background: #fdfdfd;
+    min-height: 200px;
+}
+
+.word-textarea:focus {
+    outline: none;
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+/* Action Buttons */
+.word-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    justify-content: flex-end;
+}
+
+.word-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.word-btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.word-btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.word-btn-secondary {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #4b5563;
+}
+
+.word-btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+/* Features Grid */
+.word-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.word-feature-card {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    border: 1px solid #f3f4f6;
+}
+
+.word-feature-icon {
+    background: #f5f3ff;
+    color: #8b5cf6;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.word-feature-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: #1f2937;
+}
+
+.word-feature-card p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.4;
+}

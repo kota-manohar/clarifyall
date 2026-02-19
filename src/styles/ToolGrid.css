@@ -1,0 +1,435 @@
+/* Tool Grid Container */
+.tool-grid-container {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* Tool Grid */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 3rem;
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.empty-icon {
+  width: 80px;
+  height: 80px;
+  color: var(--text-light);
+  stroke-width: 1.5;
+  margin-bottom: 1.5rem;
+  opacity: 0.6;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.5;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--primary-gradient);
+  border-color: var(--primary-color);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--bg-tertiary);
+  border-color: var(--border-color);
+  box-shadow: none;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-number:hover {
+  background: var(--bg-glass-hover);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.pagination-number.active {
+  background: var(--primary-gradient);
+  border-color: var(--primary-color);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.pagination-ellipsis {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 44px;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .tool-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .tool-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0 0.25rem;
+  }
+
+  .empty-state {
+    min-height: 300px;
+    padding: 2rem 1.5rem;
+    margin: 0 0.5rem;
+  }
+
+  .empty-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1.25rem;
+    word-wrap: break-word;
+  }
+
+  .empty-state p {
+    font-size: 0.95rem;
+    word-wrap: break-word;
+  }
+
+  .pagination {
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding: 0 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .pagination-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .pagination-btn span {
+    display: none;
+  }
+
+  .pagination-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pagination-numbers {
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .pagination-number {
+    min-width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+
+  .pagination-ellipsis {
+    min-width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 640px) {
+  .tool-grid-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .tool-grid {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .tool-grid > * {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .empty-state {
+    margin: 0;
+    padding: 2rem 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 480px) {
+  .tool-grid-container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .tool-grid {
+    gap: 0.875rem;
+    margin-bottom: 1.25rem;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .tool-grid > * {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .empty-state {
+    min-height: 250px;
+    padding: 1.5rem 1rem;
+    border-radius: 14px;
+    margin: 0;
+  }
+
+  .empty-icon {
+    width: 50px;
+    height: 50px;
+  }
+
+  .empty-state h3 {
+    font-size: 1.1rem;
+    word-wrap: break-word;
+    padding: 0 0.5rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9rem;
+    word-wrap: break-word;
+    padding: 0 0.5rem;
+  }
+
+  .pagination {
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0;
+    flex-wrap: wrap;
+  }
+
+  .pagination-btn {
+    padding: 0.65rem 1rem;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .pagination-numbers {
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  .pagination-number {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+  }
+
+  .pagination-ellipsis {
+    min-width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .tool-grid {
+    gap: 0.75rem;
+  }
+
+  .empty-state {
+    padding: 1.25rem 0.75rem;
+  }
+
+  .empty-icon {
+    width: 45px;
+    height: 45px;
+  }
+
+  .empty-state h3 {
+    font-size: 1rem;
+  }
+
+  .empty-state p {
+    font-size: 0.85rem;
+  }
+
+  .pagination {
+    gap: 0.4rem;
+  }
+
+  .pagination-btn {
+    padding: 0.6rem 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  .pagination-number {
+    min-width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  .pagination-ellipsis {
+    min-width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+}
+
+/* Tablet Landscape */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .tool-grid {
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+/* Animations */
+@keyframes gridItemEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(14, 165, 233, 0.5));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(14, 165, 233, 0.8)) drop-shadow(0 0 40px rgba(34, 211, 238, 0.6));
+    transform: scale(1.05);
+  }
+}
+
+.tool-grid > * {
+  animation: gridItemEnter 0.5s ease-out backwards;
+}
+
+/* Stagger animation for grid items */
+.tool-grid > *:nth-child(1) { animation-delay: 0.05s; }
+.tool-grid > *:nth-child(2) { animation-delay: 0.1s; }
+.tool-grid > *:nth-child(3) { animation-delay: 0.15s; }
+.tool-grid > *:nth-child(4) { animation-delay: 0.2s; }
+.tool-grid > *:nth-child(5) { animation-delay: 0.25s; }
+.tool-grid > *:nth-child(6) { animation-delay: 0.3s; }
+.tool-grid > *:nth-child(7) { animation-delay: 0.35s; }
+.tool-grid > *:nth-child(8) { animation-delay: 0.4s; }
+.tool-grid > *:nth-child(9) { animation-delay: 0.45s; }
+.tool-grid > *:nth-child(10) { animation-delay: 0.5s; }
+.tool-grid > *:nth-child(11) { animation-delay: 0.55s; }
+.tool-grid > *:nth-child(12) { animation-delay: 0.6s; }

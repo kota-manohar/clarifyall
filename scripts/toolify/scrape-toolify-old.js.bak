@@ -1,0 +1,697 @@
+// Use the new scraping approach
+const scrapeToolifyNew = require('./scrape-toolify-new');
+const scrapeToolify = scrapeToolifyNew;
+
+module.exports = scrapeToolify;
+
+/**
+ * Extract all tools from Toolify.ai
+ */
+async function scrapeToolify() {
+  console.log('🚀 Starting Toolify.ai scraping...');
+  if (MAX_TOOLS) {
+    console.log(`📊 Tool limit: ${MAX_TOOLS} tools (set MAX_TOOLS=null for all 27k+ tools)`);
+  } else {
+    console.log(`📊 Scraping ALL tools (no limit)`);
+  }
+  console.log(`📄 Page limit: ${MAX_PAGES} pages\n`);
+  
+  let browser;
+  try {
+    browser = await puppeteer.launch({
+      headless: 'new',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
+    
+    const page = await browser.newPage();
+    await page.setViewport({ width: 1920, height: 1080 });
+    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+    
+    const allTools = [];
+    const categories = new Set();
+    let pageNum = 1;
+    let hasMorePages = true;
+    const maxPages = MAX_PAGES; // Configurable limit
+    
+    // First, get all categories
+    console.log('📂 Extracting categories...');
+    await page.goto('https://www.toolify.ai/', { waitUntil: 'networkidle2', timeout: 60000 });
+    await page.waitForTimeout(3000);
+    
+    const categoryLinks = await page.evaluate(() => {
+      const links = [];
+      // Find category links in the navigation or category sections
+      document.querySelectorAll('a[href*="/category/"], a[href*="category"], .category-link, [class*="category"]').forEach(link => {
+        const href = link.getAttribute('href');
+        const text = link.textContent.trim();
+        if (href && text && !links.find(l => l.href === href)) {
+          links.push({ href, text });
+        }
+      });
+      return links;
+    });
+    
+    console.log(`Found ${categoryLinks.length} category links`);
+    
+    // Extract tools from /new page with infinite scroll
+    console.log('🔍 Extracting tools from /new page (infinite scroll)...');
+    
+    const url = 'https://www.toolify.ai/new';
+    console.log(`📄 Scraping: ${url}`);
+    
+    // Enable request interception to track image loads
+    await page.setRequestInterception(true);
+    const imageUrls = new Map(); // Store tool slug -> image URL mapping
+    
+    page.on('response', async (response) => {
+      const url = response.url();
+      if (url.includes('cdn-images.toolify.ai') && url.includes('website-logos')) {
+        // Extract tool slug from referer or URL
+        const referer = response.request().headers().referer || '';
+        const toolMatch = referer.match(/\/tool\/([^\/\?]+)/);
+        if (toolMatch) {
+          const toolSlug = toolMatch[1];
+          if (!imageUrls.has(toolSlug)) {
+            imageUrls.set(toolSlug, url);
+          }
+        }
+      }
+    });
+    
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+    // Wait for initial page load
+    await page.waitForTimeout(5000);
+    
+    // Wait for images to actually load - wait for image elements to appear
+    try {
+      await page.waitForSelector('img.el-image__inner', { timeout: 10000 });
+      console.log('✅ Images found on page');
+    } catch (e) {
+      console.log('⚠️  Images not found with selector, continuing...');
+    }
+    
+    // Wait additional time for images to fully load (not placeholders)
+    await page.waitForTimeout(10000); // Wait 10 seconds for actual images to load
+    
+    let previousToolCount = 0;
+    let scrollAttempts = 0;
+    const maxScrollAttempts = 100; // Prevent infinite loop
+    let noNewToolsCount = 0;
+    
+    // Function to scroll and wait for new content and images to load
+    const scrollAndWait = async () => {
+      const previousHeight = await page.evaluate(() => document.body.scrollHeight);
+      const previousToolCount = await page.evaluate(() => {
+        return document.querySelectorAll('.tool-item-content, .tool-item-featured-content, a[href*="/tool/"]').length;
+      });
+      
+      // Scroll to bottom
+      await page.evaluate(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+      
+      // Wait for new content to load
+      await page.waitForTimeout(3000);
+      
+      // Wait for images to load - check if new content appeared
+      try {
+        await page.waitForFunction(
+          (prevHeight) => document.body.scrollHeight > prevHeight,
+          { timeout: 8000 },
+          previousHeight
+        );
+      } catch (e) {
+        // Timeout is okay, just means no new content
+      }
+      
+      // Wait for images to actually load (not placeholders)
+      await page.waitForTimeout(10000); // Wait 10 seconds for actual images to load
+      
+      // Verify images are loaded
+      const currentToolCount = await page.evaluate(() => {
+        return document.querySelectorAll('.tool-item-content, .tool-item-featured-content, a[href*="/tool/"]').length;
+      });
+      
+      console.log(`  📊 Tools on page: ${previousToolCount} → ${currentToolCount} (${currentToolCount - previousToolCount} new)`);
+    };
+    
+    // Function to collect all tool links from the page
+    const collectToolLinks = async () => {
+      return await page.evaluate(() => {
+        const toolLinks = new Set();
+        
+        // Find all links to tool pages
+        const links = document.querySelectorAll('a[href*="/tool/"]');
+        links.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href && href.includes('/tool/')) {
+            const match = href.match(/\/tool\/([^\/\?]+)/);
+            if (match) {
+              toolLinks.add(match[1]);
+            }
+          }
+        });
+        
+        return Array.from(toolLinks);
+      });
+    };
+    
+    // Function to extract tool data from detail page
+    const extractToolFromDetailPage = async (toolSlug) => {
+      try {
+        const toolUrl = `https://www.toolify.ai/tool/${toolSlug}`;
+        await page.goto(toolUrl, { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.waitForTimeout(3000); // Wait for page to load
+        
+        // Wait for images to load
+        try {
+          await page.waitForSelector('img[src*="cdn-images.toolify.ai"]', { timeout: 5000 });
+          await page.waitForTimeout(3000); // Additional wait for actual image
+        } catch (e) {
+          // Continue even if image selector not found
+        }
+        
+        const toolData = await page.evaluate(() => {
+          const tool = {
+            name: '',
+            description: '',
+            full_description: '',
+            website_url: '',
+            logo_url: '',
+            category: '',
+            pricing_model: 'FREE',
+            platforms: [],
+            feature_tags: []
+          };
+          
+          // Extract name
+          const nameEl = document.querySelector('h1, [class*="tool-name"], [class*="title"]');
+          if (nameEl) {
+            tool.name = nameEl.textContent.trim();
+          }
+          
+          // Extract description
+          const descEl = document.querySelector('[class*="description"], [class*="desc"], p');
+          if (descEl) {
+            tool.description = descEl.textContent.trim();
+            tool.full_description = tool.description;
+          }
+          
+          // Extract website URL - look for external link
+          const externalLink = document.querySelector('a[href^="http"]:not([href*="toolify.ai"])[rel="dofollow"]') ||
+                               document.querySelector('a[href^="https"]:not([href*="toolify.ai"])');
+          if (externalLink) {
+            tool.website_url = externalLink.getAttribute('href');
+          }
+          
+          // Extract logo - find actual loaded image
+          const imgEl = document.querySelector('img[src*="cdn-images.toolify.ai"][src*="website-logos"]');
+          if (imgEl) {
+            const src = imgEl.currentSrc || imgEl.src || imgEl.getAttribute('src');
+            if (src && 
+                src.includes('cdn-images.toolify.ai') && 
+                src.includes('website-logos') &&
+                !src.includes('placeholder') &&
+                !src.includes('default') &&
+                !src.includes('toolify-logo') &&
+                !src.includes('logo.png') &&
+                !src.includes('skeleton') &&
+                src.match(/website-logos\/\d{8}\/\d+_\d+_\d+\.(webp|png|jpg|jpeg)/)) {
+              tool.logo_url = src;
+            }
+          }
+          
+          // Extract category
+          const catEl = document.querySelector('[class*="category"], .category, [class*="tag"]');
+          if (catEl) {
+            tool.category = catEl.textContent.trim();
+          }
+          
+          // Extract pricing
+          const pricingEl = document.querySelector('[class*="pricing"], [class*="price"]');
+          if (pricingEl) {
+            const pricingText = pricingEl.textContent.toLowerCase();
+            if (pricingText.includes('freemium')) tool.pricing_model = 'FREEMIUM';
+            else if (pricingText.includes('trial')) tool.pricing_model = 'FREE_TRIAL';
+            else if (pricingText.includes('paid') || pricingText.includes('$')) tool.pricing_model = 'PAID';
+            else if (pricingText.includes('open') && pricingText.includes('source')) tool.pricing_model = 'OPEN_SOURCE';
+          }
+          
+          return tool;
+        });
+        
+        // Use image URL from network interception if available
+        if (!toolData.logo_url && imageUrls.has(toolSlug)) {
+          toolData.logo_url = imageUrls.get(toolSlug);
+        }
+        
+        return toolData;
+      } catch (error) {
+        console.error(`  ❌ Error extracting tool ${toolSlug}:`, error.message);
+        return null;
+      }
+    };
+    
+    // Function to extract tools from current page (for initial extraction)
+    const extractTools = async () => {
+      return await page.evaluate(() => {
+        const tools = [];
+        const seenUrls = new Set();
+        
+        // Find all tool links first
+        const toolLinks = document.querySelectorAll('a[href*="/tool/"]');
+        const toolSlugs = new Set();
+        
+        toolLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href && href.includes('/tool/')) {
+            const match = href.match(/\/tool\/([^\/\?]+)/);
+            if (match) {
+              toolSlugs.add(match[1]);
+            }
+          }
+        });
+        
+        // For each tool, find its container and extract data
+        Array.from(toolSlugs).forEach(slug => {
+          try {
+            // Find the link for this tool
+            const toolLink = Array.from(toolLinks).find(link => {
+              const href = link.getAttribute('href');
+              return href && href.includes(`/tool/${slug}`);
+            });
+            
+            if (!toolLink) return;
+            
+            // Find the parent card/container
+            const card = toolLink.closest('.tool-item-content, .tool-item-featured-content, [class*="tool-item"], [class*="go-tool-detail"], article, [class*="card"]') || toolLink.parentElement;
+            
+            if (!card) return;
+        
+        toolElements.forEach((element, index) => {
+          try {
+            // Find the parent card/container
+            const card = element.closest('.tool-item-content, .tool-item-featured-content, [class*="tool-item"], [class*="go-tool-detail"]') || element;
+            
+            // Extract tool name - look for .tool-name or similar
+            let name = '';
+            const nameSelectors = ['.tool-name', '[class*="tool-name"]', 'h2', 'h3', 'h4', '[class*="title"]', '[class*="name"]'];
+            for (const sel of nameSelectors) {
+              const nameEl = card.querySelector(sel);
+              if (nameEl) {
+                name = nameEl.textContent.trim();
+                if (name && name.length > 2) break;
+              }
+            }
+            
+            // Extract description - look for .tool-desc
+            let description = '';
+            const descSelectors = ['.tool-desc', '[class*="tool-desc"]', '[class*="description"]', 'p'];
+            for (const sel of descSelectors) {
+              const descEl = card.querySelector(sel);
+              if (descEl) {
+                description = descEl.textContent.trim();
+                if (description && description.length > 10) break;
+              }
+            }
+            
+            // Extract website URL - look for external link with rel="dofollow"
+            let websiteUrl = '';
+            const externalLink = card.querySelector('a[href^="http"]:not([href*="toolify.ai"])[rel="dofollow"]') ||
+                                 card.querySelector('a[href^="http"]:not([href*="toolify.ai"])') ||
+                                 card.querySelector('a[href^="https"]:not([href*="toolify.ai"])');
+            if (externalLink) {
+              websiteUrl = externalLink.getAttribute('href');
+            }
+            
+            // Extract logo - look for img.el-image__inner or img inside .tool-pic
+            // Wait for image to load and filter out placeholder/Toolify logos
+            let logoUrl = '';
+            
+            // First try the specific Toolify.ai structure
+            const toolPic = card.querySelector('.tool-pic, .tool-top-wrapper, [class*="tool-pic"]');
+            if (toolPic) {
+              // Try to find the actual loaded image - wait for it to load
+              const imgEl = toolPic.querySelector('img.el-image__inner, img[src*="cdn-images.toolify.ai"], img');
+              if (imgEl) {
+                // Check if image is actually loaded (not placeholder)
+                // Wait a bit and check again if it's a placeholder
+                const checkImage = () => {
+                  const src = imgEl.getAttribute('src') || imgEl.getAttribute('data-src') || imgEl.getAttribute('data-lazy-src');
+                  const currentSrc = imgEl.currentSrc || imgEl.src || imgEl.getAttribute('src');
+                  const finalSrc = currentSrc || src;
+                  
+                  // Check if image is complete (loaded)
+                  const isComplete = imgEl.complete && imgEl.naturalHeight > 0;
+                  
+                  // Filter out placeholder/Toolify logos - only accept actual tool logos
+                  if (finalSrc && 
+                      finalSrc.includes('cdn-images.toolify.ai') && 
+                      finalSrc.includes('website-logos') &&
+                      !finalSrc.includes('placeholder') &&
+                      !finalSrc.includes('default') &&
+                      !finalSrc.includes('toolify-logo') &&
+                      !finalSrc.includes('logo.png') && // Generic logo.png is usually placeholder
+                      !finalSrc.includes('skeleton') && // Skeleton loaders
+                      finalSrc.match(/website-logos\/\d{8}\/\d+_\d+_\d+\.(webp|png|jpg|jpeg)/)) { // Match actual logo pattern
+                    return finalSrc;
+                  }
+                  return null;
+                };
+                
+                logoUrl = checkImage();
+                
+                // If not found, try waiting a bit and checking again
+                if (!logoUrl) {
+                  // Check all possible image sources
+                  const allSrcs = [
+                    imgEl.getAttribute('src'),
+                    imgEl.getAttribute('data-src'),
+                    imgEl.getAttribute('data-lazy-src'),
+                    imgEl.currentSrc,
+                    imgEl.src
+                  ].filter(s => s);
+                  
+                  for (const src of allSrcs) {
+                    if (src && 
+                        src.includes('cdn-images.toolify.ai') && 
+                        src.includes('website-logos') &&
+                        !src.includes('placeholder') &&
+                        !src.includes('default') &&
+                        !src.includes('toolify-logo') &&
+                        !src.includes('logo.png') &&
+                        !src.includes('skeleton') &&
+                        src.match(/website-logos\/\d{8}\/\d+_\d+_\d+\.(webp|png|jpg|jpeg)/)) {
+                      logoUrl = src;
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+            
+            // If not found, try other image selectors
+            if (!logoUrl) {
+              const imgSelectors = [
+                'img.el-image__inner',
+                'img[src*="cdn-images.toolify.ai"]',
+                'img[src*="website-logos"]',
+                'img[class*="el-image"]'
+              ];
+              for (const sel of imgSelectors) {
+                const imgEl = card.querySelector(sel);
+                if (imgEl) {
+                  const allSrcs = [
+                    imgEl.getAttribute('src'),
+                    imgEl.getAttribute('data-src'),
+                    imgEl.getAttribute('data-lazy-src'),
+                    imgEl.currentSrc,
+                    imgEl.src
+                  ].filter(s => s);
+                  
+                  for (const src of allSrcs) {
+                    // Only use if it's from toolify CDN with actual logo pattern, not placeholder
+                    if (src && 
+                        src.includes('cdn-images.toolify.ai') && 
+                        src.includes('website-logos') &&
+                        !src.includes('placeholder') &&
+                        !src.includes('default') &&
+                        !src.includes('toolify-logo') &&
+                        !src.includes('logo.png') &&
+                        !src.includes('skeleton') &&
+                        src.match(/website-logos\/\d{8}\/\d+_\d+_\d+\.(webp|png|jpg|jpeg)/)) {
+                      logoUrl = src;
+                      break;
+                    }
+                  }
+                  if (logoUrl) break;
+                }
+              }
+            }
+            
+            // Extract category
+            let category = '';
+            const catSelectors = ['[class*="category"]', '.category', '[class*="tag"]', '.tag'];
+            for (const sel of catSelectors) {
+              const catEl = card.querySelector(sel);
+              if (catEl) {
+                category = catEl.textContent.trim();
+                if (category) break;
+              }
+            }
+            
+            // Extract pricing info
+            let pricing = 'FREE';
+            const pricingSelectors = ['[class*="pricing"]', '[class*="price"]', '.free', '.paid', '[class*="badge"]'];
+            for (const sel of pricingSelectors) {
+              const pricingEl = card.querySelector(sel);
+              if (pricingEl) {
+                const pricingText = pricingEl.textContent.toLowerCase();
+                if (pricingText.includes('freemium')) pricing = 'FREEMIUM';
+                else if (pricingText.includes('trial')) pricing = 'FREE_TRIAL';
+                else if (pricingText.includes('paid') || pricingText.includes('$')) pricing = 'PAID';
+                else if (pricingText.includes('open') && pricingText.includes('source')) pricing = 'OPEN_SOURCE';
+              }
+            }
+            
+            // Extract platforms
+            const platforms = [];
+            const platformEls = card.querySelectorAll('[class*="platform"], .platform, [class*="badge"]');
+            platformEls.forEach(el => {
+              const text = el.textContent.trim();
+              if (text && !text.includes('Free') && !text.includes('Paid') && text.length < 50) {
+                platforms.push(text);
+              }
+            });
+            
+            // Extract tags/features
+            const tags = [];
+            const tagEls = card.querySelectorAll('[class*="tag"], .tag, [class*="badge"], [class*="feature"]');
+            tagEls.forEach(el => {
+              const text = el.textContent.trim();
+              if (text && text.length < 50 && text.length > 1) {
+                tags.push(text);
+              }
+            });
+            
+            // Only add if we have a valid name and haven't seen this URL before
+            if (name && name.length > 2) {
+              const urlKey = websiteUrl || name.toLowerCase();
+              if (!seenUrls.has(urlKey)) {
+                seenUrls.add(urlKey);
+                tools.push({
+                  name: name.substring(0, 200),
+                  description: description.substring(0, 500),
+                  full_description: description.substring(0, 2000),
+                  website_url: websiteUrl,
+                  logo_url: logoUrl,
+                  category: category,
+                  pricing_model: pricing,
+                  platforms: platforms.slice(0, 10),
+                  feature_tags: tags.slice(0, 20)
+                });
+              }
+            }
+          } catch (err) {
+            // Silently skip errors
+          }
+        });
+        
+        return tools;
+      });
+    };
+    
+    // Initial extraction - wait for images to fully load
+    console.log('⏳ Waiting for images to load before initial extraction...');
+    await page.waitForTimeout(5000);
+    
+    // Extract tools initially
+    let pageTools = await extractTools();
+    console.log(`🔍 Initial scan found ${pageTools.length} tool elements on page`);
+    
+    // Filter out tools without required data
+    const validInitialTools = pageTools.filter(t => t.name && t.name.length > 2);
+    allTools.push(...validInitialTools);
+    previousToolCount = validInitialTools.length;
+    
+    console.log(`✅ Initial extraction: ${validInitialTools.length} valid tools (Total: ${allTools.length} / ${MAX_TOOLS || 'unlimited'})`);
+    
+    // Scroll and load more tools until limit reached or no new tools
+    while (allTools.length < (MAX_TOOLS || Infinity) && scrollAttempts < maxScrollAttempts) {
+      scrollAttempts++;
+      
+      console.log(`\n📜 Scroll attempt ${scrollAttempts}...`);
+      
+      // Scroll down and wait for content/images
+      await scrollAndWait();
+      
+      // Extract tools again
+      pageTools = await extractTools();
+      console.log(`🔍 After scroll ${scrollAttempts}, found ${pageTools.length} total tool elements on page`);
+      
+      // Filter out duplicates
+      const existingUrls = new Set(allTools.map(t => t.website_url || t.name.toLowerCase()));
+      const newTools = pageTools.filter(t => {
+        const key = t.website_url || t.name.toLowerCase();
+        return !existingUrls.has(key);
+      });
+      
+      if (newTools.length > 0) {
+        allTools.push(...newTools);
+        noNewToolsCount = 0;
+        console.log(`✅ Scrolled: Found ${newTools.length} new tools (Total: ${allTools.length} / ${MAX_TOOLS || 'unlimited'})`);
+        
+        // Check if we've reached the limit
+        if (MAX_TOOLS && allTools.length >= MAX_TOOLS) {
+          console.log(`✅ Reached tool limit of ${MAX_TOOLS}, stopping...`);
+          break;
+        }
+      } else {
+        noNewToolsCount++;
+        console.log(`⚠️  No new tools found (attempt ${noNewToolsCount}/5)`);
+        if (noNewToolsCount >= 5) { // Increased from 3 to 5
+          console.log(`⚠️  No new tools found after ${noNewToolsCount} scrolls, stopping...`);
+          break;
+        }
+      }
+      
+      // Small delay between scrolls
+      await page.waitForTimeout(2000);
+    }
+    
+    console.log(`\n📊 Final tool count: ${allTools.length} tools extracted`);
+    
+    // Extract categories from all tools
+    allTools.forEach(tool => {
+      if (tool.category) {
+        categories.add(tool.category);
+      }
+    });
+    
+    // Also try to scrape by category (only if we haven't reached the limit)
+    if (!MAX_TOOLS || allTools.length < MAX_TOOLS) {
+      console.log('📂 Scraping tools by category...');
+      const maxCategories = MAX_TOOLS ? Math.min(20, Math.ceil(MAX_TOOLS / 50)) : 50;
+      for (const categoryLink of categoryLinks.slice(0, maxCategories)) {
+        try {
+          const categoryUrl = categoryLink.href.startsWith('http') 
+            ? categoryLink.href 
+            : `https://www.toolify.ai${categoryLink.href}`;
+          
+          console.log(`  Scraping category: ${categoryLink.text}`);
+          await page.goto(categoryUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+          await page.waitForTimeout(2000);
+          
+          const categoryTools = await page.evaluate((categoryName) => {
+            const tools = [];
+            const toolElements = document.querySelectorAll('.tool-card, .ai-tool, [class*="tool"], article, .card');
+            
+            toolElements.forEach(element => {
+              try {
+                const nameEl = element.querySelector('h2, h3, h4, [class*="title"]') || element;
+                const name = nameEl.textContent.trim();
+                
+                if (name) {
+                  const descEl = element.querySelector('p, [class*="description"]');
+                  const linkEl = element.querySelector('a[href^="http"]');
+                  const logoEl = element.querySelector('img');
+                  
+                  tools.push({
+                    name: name.substring(0, 200),
+                    description: descEl ? descEl.textContent.trim().substring(0, 500) : '',
+                    website_url: linkEl ? linkEl.getAttribute('href') : '',
+                    logo_url: logoEl ? (logoEl.getAttribute('src') || logoEl.getAttribute('data-src')) : '',
+                    category: categoryName
+                  });
+                }
+              } catch (err) {
+                // Skip invalid tools
+              }
+            });
+            
+            return tools;
+          }, categoryLink.text);
+          
+          // Merge with existing tools (avoid duplicates)
+          categoryTools.forEach(newTool => {
+            // Check if we've reached the limit
+            if (MAX_TOOLS && allTools.length >= MAX_TOOLS) {
+              return;
+            }
+            
+            const exists = allTools.find(t => 
+              t.name.toLowerCase() === newTool.name.toLowerCase() ||
+              (t.website_url && newTool.website_url && t.website_url === newTool.website_url)
+            );
+            if (!exists) {
+              allTools.push(newTool);
+            }
+          });
+          
+          console.log(`  ✅ Found ${categoryTools.length} tools in ${categoryLink.text} (Total: ${allTools.length}${MAX_TOOLS ? ` / ${MAX_TOOLS}` : ''})`);
+          
+          // Check if we've reached the limit
+          if (MAX_TOOLS && allTools.length >= MAX_TOOLS) {
+            console.log(`  ✅ Reached tool limit of ${MAX_TOOLS}, stopping category scraping...`);
+            break;
+          }
+          
+          await page.waitForTimeout(1500);
+        } catch (error) {
+          console.error(`  ❌ Error scraping category ${categoryLink.text}:`, error.message);
+        }
+      }
+    }
+    
+    // Save raw data
+    console.log(`\n💾 Saving ${allTools.length} tools to ${RAW_DATA_FILE}...`);
+    await fs.writeJson(RAW_DATA_FILE, allTools, { spaces: 2 });
+    
+    // Save categories
+    const categoryArray = Array.from(categories).map(name => ({
+      name: name,
+      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      description: `Tools in ${name} category`,
+      icon: '🤖'
+    }));
+    
+    console.log(`💾 Saving ${categoryArray.length} categories to ${CATEGORIES_FILE}...`);
+    await fs.writeJson(CATEGORIES_FILE, categoryArray, { spaces: 2 });
+    
+    console.log(`\n✅ Scraping complete!`);
+    console.log(`   - Total tools extracted: ${allTools.length}${MAX_TOOLS ? ` (limited to ${MAX_TOOLS})` : ''}`);
+    console.log(`   - Total categories found: ${categoryArray.length}`);
+    if (MAX_TOOLS) {
+      console.log(`   - Note: Scraping was limited to ${MAX_TOOLS} tools. Set MAX_TOOLS=null or remove it to scrape all tools.`);
+    }
+    
+    return {
+      tools: allTools,
+      categories: categoryArray
+    };
+    
+  } catch (error) {
+    console.error('❌ Fatal error during scraping:', error);
+    throw error;
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+  }
+}
+
+// Run if called directly
+if (require.main === module) {
+  scrapeToolify()
+    .then(() => {
+      console.log('✅ Scraping completed successfully');
+      process.exit(0);
+    })
+    .catch(error => {
+      console.error('❌ Scraping failed:', error);
+      process.exit(1);
+    });
+}
+
+module.exports = scrapeToolify;
+

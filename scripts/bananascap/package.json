@@ -1,0 +1,27 @@
+{
+  "name": "bananaprompts-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for image prompts from bananaprompts.xyz",
+  "main": "scrape-banana-prompts.js",
+  "scripts": {
+    "scrape": "node scrape-banana-prompts.js",
+    "download-images": "node download-images.js",
+    "generate-sql": "node generate-sql.js",
+    "all": "node scrape-banana-prompts.js && node download-images.js && node generate-sql.js"
+  },
+  "keywords": [
+    "scraper",
+    "bananaprompts",
+    "prompts",
+    "images"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "fs-extra": "^11.1.1"
+  }
+}
+
+
+

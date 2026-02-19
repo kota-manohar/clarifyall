@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "AI & Machine Learning",
+    "slug": "ai-machine-learning",
+    "description": "Tools for artificial intelligence and machine learning",
+    "icon": "🤖"
+  },
+  {
+    "id": 2,
+    "name": "Development Tools",
+    "slug": "development-tools",
+    "description": "Software development and coding tools",
+    "icon": "💻"
+  },
+  {
+    "id": 3,
+    "name": "Design & Creative",
+    "slug": "design-creative",
+    "description": "Design, graphics, and creative tools",
+    "icon": "🎨"
+  },
+  {
+    "id": 4,
+    "name": "Productivity",
+    "slug": "productivity",
+    "description": "Tools to boost productivity and efficiency",
+    "icon": "⚡"
+  },
+  {
+    "id": 5,
+    "name": "Marketing & SEO",
+    "slug": "marketing-seo",
+    "description": "Marketing, SEO, and analytics tools",
+    "icon": "📈"
+  },
+  {
+    "id": 6,
+    "name": "Communication",
+    "slug": "communication",
+    "description": "Communication and collaboration tools",
+    "icon": "💬"
+  }
+]

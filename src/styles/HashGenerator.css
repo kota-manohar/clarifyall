@@ -1,0 +1,266 @@
+/* Hash Generator Tool Specific Styles */
+
+.hash-tool-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+}
+
+.hash-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.hash-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 1rem;
+}
+
+.hash-header p {
+    font-size: 1.125rem;
+    color: #6b7280;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Toggle Buttons / Segmented Control */
+.hash-toggle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f3f4f6;
+    padding: 0.5rem;
+    border-radius: 16px;
+    width: fit-content;
+    margin: 0 auto 2.5rem auto;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.hash-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 2.5rem;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-weight: 600;
+    font-size: 1.125rem;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.hash-toggle-btn:hover {
+    color: #374151;
+}
+
+.hash-toggle-btn.active {
+    background-color: white;
+    color: #0ea5e9;
+    /* Sky blue for hash tool */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Input/Output Sections */
+.hash-card {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e5e7eb;
+    padding: 2.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 3rem;
+}
+
+.hash-upload-zone {
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 3rem 2rem;
+    text-align: center;
+    transition: all 0.2s;
+    cursor: pointer;
+    background: #f9fafb;
+}
+
+.hash-upload-zone:hover,
+.hash-upload-zone.dragging {
+    border-color: #0ea5e9;
+    background: #f0f9ff;
+}
+
+.hash-upload-icon {
+    background: #e0f2fe;
+    color: #0ea5e9;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+}
+
+.hash-textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    resize: vertical;
+    transition: border-color 0.2s;
+    background: #fdfdfd;
+}
+
+.hash-textarea:focus {
+    outline: none;
+    border-color: #0ea5e9;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+}
+
+.hash-action-btn {
+    width: 100%;
+    background: #0ea5e9;
+    color: white;
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.125rem;
+    margin-top: 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.hash-action-btn:hover:not(:disabled) {
+    background: #0284c7;
+}
+
+.hash-action-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* File Info Display */
+.file-info-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+}
+
+.file-info-icon {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    color: #0ea5e9;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #334155;
+}
+
+.file-size {
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+/* Results Section */
+.hash-results-container {
+    margin-top: 2.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.hash-result-item {
+    margin-bottom: 1.5rem;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.hash-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #f1f5f9;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.hash-algo-name {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.hash-copy-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: white;
+    border: 1px solid #cbd5e1;
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.hash-copy-btn:hover {
+    border-color: #94a3b8;
+    color: #334155;
+}
+
+.hash-value {
+    padding: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.875rem;
+    color: #334155;
+    word-break: break-all;
+    background: white;
+}
+
+.hash-reset-btn {
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.hash-reset-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}

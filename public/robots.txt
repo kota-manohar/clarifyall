@@ -1,0 +1,66 @@
+# robots.txt for ClarifyAll
+# Optimized to help Googlebot focus on high-value content
+# Blocks low-value pages (admin, auth, user-specific) to maximize crawl budget for important content
+
+User-agent: *
+
+# Block Admin Pages (Low-value, should not be indexed)
+Disallow: /admin/
+
+# Block Authentication Pages (Low-value, user-specific)
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+
+# Block User-Specific Pages (Low-value, personalized content)
+Disallow: /profile/
+Disallow: /saved-tools
+Disallow: /my-submissions
+Disallow: /my-profile
+Disallow: /my-collections
+Disallow: /submit
+Disallow: /submit-prompt
+
+# Block API Endpoints (Not meant for crawling)
+Disallow: /php-api/
+Disallow: /api/
+
+# Block Test/Development Pages
+Disallow: /test-ai-generators
+
+# Block Search Filters and Query Parameters (Prevent duplicate content)
+# Blocks URLs with query parameters used for filtering/searching/pagination
+Disallow: /*?search=
+Disallow: /*?filter=
+Disallow: /*?sort=
+Disallow: /*?page=
+Disallow: /*?category=
+Disallow: /*?type=
+Disallow: /*?status=
+Disallow: /*?q=
+Disallow: /*?query=
+
+# Allow Important Pages (High-value content)
+# These explicit allows ensure important content is crawled even if query params are blocked
+Allow: /
+Allow: /tools
+Allow: /tool/
+Allow: /prompts
+Allow: /prompts/
+Allow: /blog
+Allow: /blog/
+Allow: /categories
+Allow: /about
+Allow: /privacy
+Allow: /terms
+Allow: /cookies
+Allow: /disclaimer
+
+# Sitemap Location
+Sitemap: https://clarifyall.com/sitemap.xml
+
+# Crawl-delay (Optional - helps manage server load)
+# Crawl-delay: 1
+

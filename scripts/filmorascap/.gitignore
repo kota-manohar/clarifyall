@@ -1,0 +1,14 @@
+# Output directories
+output/
+sql-output/
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+

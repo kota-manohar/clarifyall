@@ -1,0 +1,247 @@
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-top: 1px solid rgba(102, 126, 234, 0.3);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  padding: 0.75rem 1rem;
+  animation: slideUp 0.4s ease-out;
+  transform: translateY(0);
+  transition: transform 0.3s ease-out;
+}
+
+.cookie-banner-closing {
+  transform: translateY(100%);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cookie-banner-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cookie-banner-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  margin-bottom: 0.625rem;
+  position: relative;
+}
+
+.cookie-banner-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+  animation: cookieBounce 2s ease-in-out infinite;
+}
+
+@keyframes cookieBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+}
+
+.cookie-banner-text {
+  flex: 1;
+  color: #e0e0e0;
+}
+
+.cookie-banner-title {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.01em;
+}
+
+.cookie-banner-description {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #b0b0b0;
+  margin: 0;
+}
+
+.cookie-banner-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  margin-left: 0.25rem;
+}
+
+.cookie-banner-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+.cookie-banner-close {
+  position: absolute;
+  top: -0.125rem;
+  right: -0.125rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #b0b0b0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.cookie-banner-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.cookie-banner-close svg {
+  width: 12px;
+  height: 12px;
+}
+
+.cookie-banner-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.cookie-banner-btn {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  min-width: 85px;
+}
+
+.cookie-banner-btn-accept {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+}
+
+.cookie-banner-btn-accept:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(102, 126, 234, 0.4);
+}
+
+.cookie-banner-btn-reject {
+  background: rgba(255, 255, 255, 0.1);
+  color: #b0b0b0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cookie-banner-btn-reject:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cookie-banner {
+    padding: 1.25rem 1rem;
+  }
+
+  .cookie-banner-content {
+    flex-direction: row;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .cookie-banner-icon {
+    font-size: 1.75rem;
+  }
+
+  .cookie-banner-title {
+    font-size: 1rem;
+  }
+
+  .cookie-banner-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .cookie-banner-close {
+    top: -0.25rem;
+    right: -0.25rem;
+    width: 28px;
+    height: 28px;
+  }
+
+  .cookie-banner-close svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .cookie-banner-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .cookie-banner-btn {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .cookie-banner {
+    padding: 1rem 0.875rem;
+  }
+
+  .cookie-banner-content {
+    gap: 0.75rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .cookie-banner-icon {
+    font-size: 1.5rem;
+  }
+
+  .cookie-banner-title {
+    font-size: 0.9375rem;
+    margin-bottom: 0.375rem;
+  }
+
+  .cookie-banner-description {
+    font-size: 0.8125rem;
+  }
+
+  .cookie-banner-actions {
+    gap: 0.75rem;
+  }
+
+  .cookie-banner-btn {
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+  }
+}
+

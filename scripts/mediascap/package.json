@@ -1,0 +1,25 @@
+{
+  "name": "mediaio-prompts-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for Gemini AI Photo Prompts from Media.io",
+  "main": "scrape-mediaio-prompts.js",
+  "scripts": {
+    "scrape": "node scrape-mediaio-prompts.js",
+    "download-images": "node download-images.js",
+    "generate-sql": "node generate-sql.js",
+    "all": "node scrape-mediaio-prompts.js && node download-images.js && node generate-sql.js"
+  },
+  "keywords": [
+    "scraper",
+    "mediaio",
+    "prompts",
+    "gemini"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "puppeteer": "^21.0.0",
+    "fs-extra": "^11.1.1"
+  }
+}
+

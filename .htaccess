@@ -1,0 +1,81 @@
+# Force HTTPS and www redirect
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Force HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    
+    # Force www to non-www (or vice versa - choose one)
+    # Option 1: Redirect www to non-www (recommended)
+    RewriteCond %{HTTP_HOST} ^www\.clarifyall\.com$ [NC]
+    RewriteRule ^(.*)$ https://clarifyall.com/$1 [L,R=301]
+    
+    # Option 2: Redirect non-www to www (uncomment if preferred)
+    # RewriteCond %{HTTP_HOST} !^www\.clarifyall\.com$ [NC]
+    # RewriteRule ^(.*)$ https://www.clarifyall.com/$1 [L,R=301]
+</IfModule>
+
+# Security Headers
+<IfModule mod_headers.c>
+    # HSTS (Strict-Transport-Security) - Force HTTPS for 1 year
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    
+    # Additional Security Headers
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Browser Caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+    ExpiresByType application/json "access plus 0 seconds"
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# Cache Control Headers
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+        Header set Cache-Control "max-age=31536000, public"
+    </FilesMatch>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "max-age=2592000, public"
+    </FilesMatch>
+</IfModule>
+
+# React Router - Handle client-side routing
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    
+    # Don't rewrite files or directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Don't rewrite API calls
+    RewriteCond %{REQUEST_URI} !^/php-api/
+    
+    # Rewrite everything else to index.html
+    RewriteRule . /index.html [L]
+</IfModule>
+
+# Custom 404 Error Page
+ErrorDocument 404 /index.html
+
+

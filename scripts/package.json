@@ -1,0 +1,30 @@
+{
+  "name": "scrapers",
+  "version": "1.0.0",
+  "description": "Scripts to extract AI tools from various websites and generate SQL INSERT scripts",
+  "main": "toolify/run-extraction.js",
+  "scripts": {
+    "toolify:cleanup": "node toolify/cleanup.js",
+    "toolify:scrape": "node toolify/scrape-toolify.js",
+    "toolify:parse": "node toolify/parse-toolify-data.js",
+    "toolify:download-logos": "node toolify/download-logos.js",
+    "toolify:map-categories": "node toolify/map-categories.js",
+    "toolify:generate-sql": "node toolify/generate-insert-sql.js",
+    "toolify:validate-sql": "node toolify/validate-sql.js",
+    "toolify:extract": "node toolify/run-extraction.js",
+    "aitoolsdirectory:scrape": "node aitoolsdirectory/scrape-aitoolsdirectory.js",
+    "aitoolsdirectory:parse": "node aitoolsdirectory/parse-data.js",
+    "aitoolsdirectory:map-categories": "node aitoolsdirectory/map-categories.js",
+    "aitoolsdirectory:generate-sql": "node aitoolsdirectory/generate-insert-sql.js",
+    "aitoolsdirectory:download-logos": "node aitoolsdirectory/download-logos.js",
+    "aitoolsdirectory:full-extraction": "node aitoolsdirectory/run-extraction.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.6.1",
+    "cheerio": "^1.0.0-rc.12",
+    "axios": "^1.6.2",
+    "mysql2": "^3.6.5",
+    "dotenv": "^16.3.1",
+    "fs-extra": "^11.2.0"
+  }
+}

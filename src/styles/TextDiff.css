@@ -1,0 +1,234 @@
+/* Text Diff Tool Specific Styles */
+
+.text-diff-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #1f2937;
+}
+
+.diff-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.diff-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #9ca3af;
+    /* Gray title as per screenshot */
+}
+
+.diff-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.btn-clear {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.btn-export {
+    background: white;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+}
+
+.btn-save {
+    background: #374151;
+    color: white;
+}
+
+.btn-share {
+    background: #10b981;
+    color: white;
+}
+
+.btn-explain {
+    background: #a855f7;
+    color: white;
+}
+
+/* Stats Row */
+.stats-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.stat-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-removals {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.badge-additions {
+    background: #d1fae5;
+    color: #059669;
+}
+
+.stat-meta {
+    color: #6b7280;
+    font-size: 0.875rem;
+    font-family: monospace;
+}
+
+/* Side-by-Side Diff Container */
+.diff-viewer-container {
+    display: flex;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white;
+    min-height: 500px;
+}
+
+.diff-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+}
+
+.diff-column.left {
+    border-right: 1px solid #e5e7eb;
+}
+
+.diff-line {
+    display: flex;
+    min-height: 24px;
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.line-number {
+    width: 40px;
+    min-width: 40px;
+    padding: 0 0.5rem;
+    text-align: right;
+    color: #9ca3af;
+    user-select: none;
+    background: #f9fafb;
+    border-right: 1px solid #f3f4f6;
+}
+
+.line-content {
+    flex: 1;
+    padding: 0 0.5rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* Highlight Styles */
+.diff-line.removed {
+    background-color: #ffebe9;
+}
+
+.diff-line.added {
+    background-color: #e6ffec;
+}
+
+.highlight-red {
+    background-color: #ff818266;
+    border-radius: 2px;
+}
+
+.highlight-green {
+    background-color: #acf2bd;
+    border-radius: 2px;
+}
+
+.diff-empty {
+    background-color: #f3f4f6;
+}
+
+/* Editor Inputs (Preserved from previous design but namespaced) */
+.input-area-wrapper {
+    margin-bottom: 2rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.diff-inputs-grid {
+    display: flex;
+    gap: 2rem;
+}
+
+.diff-input-col {
+    flex: 1;
+}
+
+.editor-textarea {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-family: monospace;
+    min-height: 200px;
+    resize: vertical;
+}
+
+.compare-action-btn {
+    background: #10b981;
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    margin: 1rem auto;
+    display: block;
+    transition: all 0.2s;
+}
+
+.compare-action-btn:hover {
+    background: #059669;
+}
+
+@media (max-width: 768px) {
+    .diff-viewer-container {
+        flex-direction: column;
+    }
+
+    .diff-column.left {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+    }
+}

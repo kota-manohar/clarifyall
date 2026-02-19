@@ -1,0 +1,59 @@
+# Prevent direct access to sensitive files
+<Files "api-init.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files ".env">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Protect log and cache directories
+<DirectoryMatch "^(.*/)?(logs|cache)(/.*)?$">
+    Order Allow,Deny
+    Deny from all
+</DirectoryMatch>
+
+# Enable CORS for API endpoints
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-API-Key, X-Requested-With, Accept"
+    Header always set Access-Control-Max-Age "3600"
+</IfModule>
+
+# Rewrite rules for API routing
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Handle OPTIONS requests first (for CORS preflight)
+    RewriteCond %{REQUEST_METHOD} ^OPTIONS
+    RewriteRule ^(.*)$ $1 [R=200,L]
+    
+    # Route /tool-comments/ID to tool-comments.php
+    # Example: /php-api/tool-comments/27 -> /php-api/tool-comments.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^tool-comments/([0-9]+)/?$ tool-comments.php [L,QSA]
+    
+    # Route /tool-comments/TOOL_ID/COMMENT_ID to tool-comments.php
+    # Example: /php-api/tool-comments/27/5 -> /php-api/tool-comments.php
+    RewriteRule ^tool-comments/([0-9]+)/([0-9]+)/?$ tool-comments.php [L,QSA]
+    
+    # Allow direct access to PHP files
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^(.*)$ $1 [L]
+</IfModule>
+
+# Force HTTPS (uncomment when ready)
+# <IfModule mod_rewrite.c>
+#     RewriteEngine On
+#     RewriteCond %{HTTPS} off
+#     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>

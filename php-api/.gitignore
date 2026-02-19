@@ -1,0 +1,25 @@
+# Environment files
+.env
+
+# Logs
+logs/
+*.log
+
+# Cache
+cache/
+*.cache
+
+# Sensitive data
+config.local.php
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+

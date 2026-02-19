@@ -1,0 +1,2 @@
+# SQL.js WASM file will be loaded from CDN
+# This is just a placeholder - the actual file will be loaded from https://sql.js.org/dist/sql-wasm.wasm
